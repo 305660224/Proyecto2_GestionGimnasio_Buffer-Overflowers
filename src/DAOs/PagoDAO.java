@@ -36,6 +36,23 @@ public class PagoDAO {
         return false;
     }
     
+     public boolean eliminarPago(int idPago) {
+        String sql = "DELETE FROM historial_pagos WHERE id_pago = ?";
+        
+        try (Connection conn = ConexionBD.getInstancia().getConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idPago);
+            int filasAfectadas = pstmt.executeUpdate();
+            
+            return filasAfectadas > 0; // Retorna true si se eliminó al menos una fila
+            
+        } catch (SQLException e) {
+            System.err.println("Error eliminando" + idPago + ": " + e.getMessage());
+            return false;
+        }
+    }
+    
     // Busca por ID (solo devuelve los 3 campos de BD)
     public Pago buscarPorId(int idPago) {
         String sql = "SELECT idPago, cedulaCliente, fechaPago FROM historialpagos WHERE idPago = ?";

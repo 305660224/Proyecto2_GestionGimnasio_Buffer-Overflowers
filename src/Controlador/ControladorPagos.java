@@ -104,6 +104,30 @@ public class ControladorPagos {
         generarComprobantes(pago, nombreCliente, generarPDF, generarXML);
     }
 
+public boolean eliminarPago(int idPago) {
+    try {
+        // Primero, verifica si el pago existe
+        Pago pago = pagoDAO.buscarPorId(idPago);
+        if (pago == null) {
+            System.err.println("Pago con ID " + idPago + " no encontrado");
+            return false;
+        }
+        
+        // Llama al método eliminar del DAO
+        boolean eliminado = pagoDAO.eliminarPago(idPago);
+        
+        if (!eliminado) {
+            System.err.println("Error eliminando" + idPago);
+        }
+        
+        return eliminado;
+        
+    } catch (Exception e) {
+        System.err.println("Error en eliminarPago: " + e.getMessage());
+        return false;
+    }
+}
+    
     /**
      * Método privado para generar comprobantes
      */
