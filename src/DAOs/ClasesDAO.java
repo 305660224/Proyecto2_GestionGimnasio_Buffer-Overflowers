@@ -20,14 +20,15 @@ public class ClasesDAO {
     }
 
     public boolean registrarClase(Clases clase) {
-        String sql = "INSERT INTO clases (tipoClase, descripcion, precio, ubicacion, horario, capacidad) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clases (tipoClase, descripcion, precio, ubicacion, horario, capacidad) VALUES (?, ?, ?, ?, ?, ?,?)";
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, clase.getTipoClase());
             ps.setString(2, clase.getDescripcion());
             ps.setDouble(3, clase.getPrecio());
             ps.setString(4, clase.getUbicacion());
             ps.setTimestamp(5, Timestamp.valueOf(clase.getHorario())); // Convertir a Timestamp
-            ps.setInt(6, clase.getCapacidad());
+            ps.setInt(6, clase.getCapacidadMax());
+            ps.setInt(7, clase.getIdEntrenador());
 
             int filas = ps.executeUpdate();
             return filas > 0;
@@ -50,7 +51,8 @@ public class ClasesDAO {
                     rs.getDouble("precio"),
                     rs.getString("ubicacion"),
                     rs.getTimestamp("horario").toLocalDateTime(),
-                    rs.getInt("capacidad")
+                    rs.getInt("capacidad"),
+                    rs.getInt("IdEntrenador")
                 );
             }
         } catch (SQLException e) {
@@ -59,20 +61,20 @@ public class ClasesDAO {
         return null;
     }
 
-    public List<Clase> listarTodos() {
-        List<Clase> lista = new ArrayList<>();
+    public List<Clases> listarTodos() {
+        List<Clases> lista = new ArrayList<>();
         String sql = "SELECT * FROM clases ORDER BY horario DESC";
         try (Statement st = conexion.createStatement(); 
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 lista.add(new Clase(
-                    rs.getInt("id"),
+                    rs.getInt("idClase"),
                     rs.getString("tipoClase"),
                     rs.getString("descripcion"),
                     rs.getDouble("precio"),
                     rs.getString("ubicacion"),
                     rs.getTimestamp("horario").toLocalDateTime(),
-                    rs.getInt("capacidad")
+                    rs.getInt("capacidadMax")
                 ));
             }
         } catch (SQLException e) {
@@ -82,15 +84,17 @@ public class ClasesDAO {
     }
 
     public boolean actualizarClase(Clases clase) {
-        String sql = "UPDATE clases SET tipoClase = ?, descripcion = ?, precio = ?, ubicacion = ?, horario = ?, capacidad = ? WHERE id = ?";
+        String sql = "UPDATE clases SET tipoClase = ?, descripcion = ?, precio = ?, ubicacion = ?, horario = ?, capacidad = ?, idEntrenador = ?  WHERE id = ?";
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, clase.getTipoClase());
             ps.setString(2, clase.getDescripcion());
             ps.setDouble(3, clase.getPrecio());
             ps.setString(4, clase.getUbicacion());
             ps.setTimestamp(5, Timestamp.valueOf(clase.getHorario())); // Convertir a Timestamp
-            ps.setInt(6, clase.getCapacidad());
-            ps.setInt(7, clase.getId());
+            ps.setInt(6, clase.getCapacidadMax());
+            ps.setInt(7, clase.getIdEntrenador());
+            ps.setInt(8, clase.getIdClase());
+            
 
             int filas = ps.executeUpdate();
             return filas > 0;
