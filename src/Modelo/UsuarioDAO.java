@@ -22,7 +22,7 @@ public UsuarioDAO(){
 }
     @Override
     public Usuario buscarPorUsername(String usuario) {
-        String sql = "SELECT idUsuario, usuario, contrasena, idRol FROM usuario WHERE usuarios = ?";
+        String sql = "SELECT idUsuario, usuario, contrasena, idRol FROM usuarios WHERE usuario = ?";
         Usuario u = null;
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
