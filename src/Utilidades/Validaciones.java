@@ -3,6 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Utilidades;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 /**
@@ -36,4 +39,17 @@ public class Validaciones {
         if(cedula == null) return false;
         return cedula.matches("^[1-8]\\d{8}(\\d{2})?$");
     }
+     public static LocalDate parsearFecha(String fechaTexto) {
+        if (fechaTexto == null || fechaTexto.trim().isEmpty()) {
+            return null;
+        }
+        
+        try {
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return LocalDate.parse(fechaTexto, formato);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+    
 }
