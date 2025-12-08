@@ -13,7 +13,13 @@ import java.util.Date;
  *
  * @author ASUS
  */
-public class GeneradorPDF {
+public class GeneradorPDF implements GeneradorComprobante{
+    
+    public void generarComprobante(String ruta, int idPago, String cliente, Date fecha, 
+                                 double subtotal, double impuesto, double total) {
+        generarComprobantePago(ruta, idPago, cliente, fecha, subtotal, impuesto, total);
+    }
+    
     public static void generarComprobantePago(String ruta, int idPago, String cliente, Date fecha, double subtotal, double impuesto, double total) {
         try {
             String rutaHTML = ruta.replace(".pdf", ".html");

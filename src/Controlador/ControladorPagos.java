@@ -9,6 +9,8 @@ import DAOs.PagoDAO;
 import DTOs.PagoDTO;
 import Mappers.PagoMapper;
 import Modelo.Cliente;
+import Utilidades.ComprobanteFactory;
+import Utilidades.GeneradorComprobante;
 import Utilidades.GeneradorPDF;
 import Utilidades.GeneradorXML;
 import java.awt.Desktop;
@@ -123,39 +125,49 @@ public boolean eliminarPago(int idPago) {
 //METODOS PRIVADOS --------------------------------------------------------------
 
     private void generarComprobantes(Pago pago, String nombreCliente, boolean generarPDF, boolean generarXML) {
-        if (pago == null) return;
-        
-        Date fecha = (pago.getFechaPago() != null) ? pago.getFechaPago() : new Date();
-        
-        if (generarPDF) {
-            String rutaPDF = "facturas/factura_" + pago.getIdPago() + ".pdf";
-        GeneradorPDF.generarComprobantePago(
-            rutaPDF, 
-            pago.getIdPago(), 
-            nombreCliente,
-            fecha,
-            pago.getSubtotal(),
-            pago.getImpuesto(),
-            pago.getTotal()
-        );
+    if (pago == null) return;
+    
+    Date fecha = (pago.getFechaPago() != null) ? pago.getFechaPago() : new Date();
+    String basePath = "facturas/factura_" + pago.getIdPago();
+    if (generarPDF) {
+        try {
+            GeneradorComprobante generador = ComprobanteFactory.crearGenerador("PDF");
+            generador.generarComprobante(
+                basePath + ".pdf", 
+                pago.getIdPago(), 
+                nombreCliente,
+                fecha,
+                pago.getSubtotal(),
+                pago.getImpuesto(),
+                pago.getTotal()
+            );
             
-            abrirComprobanteEnNavegador(rutaPDF.replace(".pdf", ".html"));
+            abrirComprobanteEnNavegador(basePath + ".html");
+        } catch (Exception e) {
         }
-        
-        if (generarXML) {
-        GeneradorXML.generarReportePagoXML(
-            "facturas/factura_" + pago.getIdPago() + ".xml", 
-            pago.getIdPago(), 
-            nombreCliente, 
-            fecha,
-            pago.getSubtotal(),
-            pago.getImpuesto(),
-            pago.getTotal()
-        );
+    }
+
+    if (generarXML) {
+        try {
+            GeneradorComprobante generador = ComprobanteFactory.crearGenerador("XML");
+            generador.generarComprobante(
+                basePath + ".xml", 
+                pago.getIdPago(), 
+                nombreCliente, 
+                fecha,
+                pago.getSubtotal(),
+                pago.getImpuesto(),
+                pago.getTotal()
+            );
+            
+        } catch (Exception e) {
+            System.err.println("Error generando XML: " + e.getMessage());
+        }
     }
 }
     
     private void abrirComprobanteEnNavegador(String rutaArchivo) {
+        System.out.println(rutaArchivo);
         try {
             File archivo = new File(rutaArchivo);
             

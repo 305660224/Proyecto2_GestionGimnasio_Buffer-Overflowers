@@ -20,9 +20,14 @@ import java.util.Date;
  *
  * @author ASUS
  */
-public class GeneradorXML {
+public class GeneradorXML implements GeneradorComprobante {
         
       
+    public void generarComprobante(String ruta, int idPago, String cliente, Date fecha, 
+                                 double subtotal, double impuesto, double total) {
+        generarReportePagoXML(ruta, idPago, cliente, fecha, subtotal, impuesto, total);
+    }
+    
     public static void generarReportePagoXML(String ruta, int idPago, String cliente, Date fecha, double subtotal, double impuesto, double total) {
         try {
             // Crear documento XML
