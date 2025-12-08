@@ -95,6 +95,6 @@ public class ControladorCliente {
        if(cedula == null || cedula.trim().isEmpty()){
        return null;
    }
-   return clienteDAO.buscarPorId(cedula);
+   return clienteDAO.buscarPorId(cedula.trim());
 }
 }
