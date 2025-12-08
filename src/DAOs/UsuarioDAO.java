@@ -25,24 +25,36 @@ public class UsuarioDAO implements UsuarioIN {
     @Override
     public Usuario buscarPorUsername(String usuario) {
         String sql = "SELECT idUsuario, usuario, contrasena, idRol FROM usuarios WHERE usuario = ?";
-        Usuario u = null;
-        try (CallableStatement cs = conexion.prepareCall(sql)) {
-            cs.setString(1, usuario);
-            try (ResultSet rs = cs.executeQuery()) {
-                if (rs.next()) {
-                    u = new Usuario();
-                    u.setIdusuario(rs.getInt("idusuario"));
-                    u.setUsuario(rs.getString("usuario"));
-                    u.setContrasena(rs.getBytes("contrasena"));
-                    int rolId = rs.getInt("idRol");
-                    u.setIdRol(EnumRol.porId(rolId));
+    Usuario u = null;
+    try (CallableStatement cs = conexion.prepareCall(sql)) {
+        cs.setString(1, usuario);
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                u = new Usuario();
+                u.setIdusuario(rs.getInt("idusuario"));
+                u.setUsuario(rs.getString("usuario"));
+                u.setContrasena(rs.getBytes("contrasena"));
+                int rolId = rs.getInt("idRol");
+                
+                if (rs.wasNull()) {
+                    u.setIdRol(EnumRol.ENTRENADOR);
+                } else {
+                    try {
+                        u.setIdRol(EnumRol.porId(rolId));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Advertencia: Rol no válido: " + rolId + 
+                                           ", asignando ENTRENADOR por defecto");
+                        u.setIdRol(EnumRol.ENTRENADOR);
+                    }
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error buscando usuario: " + e.getMessage());
         }
-        return u;
+    } catch (SQLException e) {
+        System.err.println("Error buscando usuario: " + e.getMessage());
     }
+    return u;
+}
+
 
     @Override
     public boolean registrar(Usuario usuario) {
@@ -58,49 +70,70 @@ public class UsuarioDAO implements UsuarioIN {
         }
     }
 
-    @Override
-    public List<Usuario> listarTodos() {
-        List<Usuario> listaUsuarios = new ArrayList<>();
-        String sql = "{CALL ver_usuarios()}";
-        try (CallableStatement cs = conexion.prepareCall(sql); 
-             ResultSet rs = cs.executeQuery()) {
-            while (rs.next()) {
-                Usuario u = new Usuario();
+public List<Usuario> listarTodos() {
+    List<Usuario> listaUsuarios = new ArrayList<>();
+    String sql = "{CALL ver_usuarios()}";
+    try (CallableStatement cs = conexion.prepareCall(sql); 
+         ResultSet rs = cs.executeQuery()) {
+        while (rs.next()) {
+            Usuario u = new Usuario();
+            u.setIdusuario(rs.getInt("idUsuario"));
+            u.setUsuario(rs.getString("usuario"));
+            u.setContrasena(rs.getBytes("contrasena"));
+            int idRolBD = rs.getInt("idRol");
+       
+            if (rs.wasNull()) {
+
+                u.setIdRol(EnumRol.ENTRENADOR);
+            } else {
+                try {
+                    u.setIdRol(EnumRol.porId(idRolBD));
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Advertencia: Rol no válido en BD: " + idRolBD + 
+                                       ", asignando ENTRENADOR por defecto");
+                    u.setIdRol(EnumRol.ENTRENADOR);
+                }
+            }
+            
+            listaUsuarios.add(u);
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al listar usuarios: " + e.getMessage());
+    }
+    return listaUsuarios;
+}
+
+    public Usuario buscarPorId(int id) {
+String sql = "SELECT idUsuario, usuario, contrasena, idRol FROM usuarios WHERE idUsuario = ?";
+    Usuario u = null;
+    try (CallableStatement cs = conexion.prepareCall(sql)) {
+        cs.setInt(1, id);
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                u = new Usuario();
                 u.setIdusuario(rs.getInt("idUsuario"));
                 u.setUsuario(rs.getString("usuario"));
                 u.setContrasena(rs.getBytes("contrasena"));
-                int idRolBD = rs.getInt("idRol");
-                u.setIdRol(EnumRol.porId(idRolBD));
-                listaUsuarios.add(u);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al listar usuarios: " + e.getMessage());
-        }
-        return listaUsuarios;
-    }
-
-       //por query de busqueda de usuario por medio del id que tiene
-    @Override
-    public Usuario buscarPorId(int id) {
-        String sql = "SELECT idUsuario, usuario, contrasena, idRol FROM usuarios WHERE idUsuario = ?";
-        Usuario u = null;
-        try (CallableStatement cs = conexion.prepareCall(sql)) {
-            cs.setInt(1, id);
-            try (ResultSet rs = cs.executeQuery()) {
-                if (rs.next()) {
-                    u = new Usuario();
-                    u.setIdusuario(rs.getInt("idUsuario"));
-                    u.setUsuario(rs.getString("usuario"));
-                    u.setContrasena(rs.getBytes("contrasena"));
-                    int rolId = rs.getInt("idRol");
-                    u.setIdRol(EnumRol.porId(rolId));
+                int rolId = rs.getInt("idRol");
+     
+                if (rs.wasNull()) {
+                    u.setIdRol(EnumRol.ENTRENADOR);
+                } else {
+                    try {
+                        u.setIdRol(EnumRol.porId(rolId));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Advertencia: Rol no válido: " + rolId + 
+                                           ", asignando ENTRENADOR por defecto");
+                        u.setIdRol(EnumRol.ENTRENADOR);
+                    }
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error buscando usuario por ID: " + e.getMessage());
         }
-        return u;
+    } catch (SQLException e) {
+        System.err.println("Error buscando usuario por ID: " + e.getMessage());
     }
+    return u;
+}
 
     @Override
     public boolean actualizar(Usuario usuario) {

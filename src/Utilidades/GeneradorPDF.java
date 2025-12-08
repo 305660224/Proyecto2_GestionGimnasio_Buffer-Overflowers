@@ -25,7 +25,7 @@ public class GeneradorPDF {
                 <html>
                 <head>
                     <meta charset="UTF-8">
-                    <title>Factura #%d - Gimnasio UTN</title>
+                    <title>Factura #%d - SMARTFIT</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 40px; }
                         .factura { border: 2px solid #333; padding: 30px; max-width: 600px; margin: 0 auto; }

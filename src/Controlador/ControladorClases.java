@@ -23,9 +23,19 @@ public class ControladorClases {
     public ControladorClases(){
        this.clasesDAO = new ClasesDAO(); 
     }
-  public boolean registrarClase(TipoClase tipo, String descripcion, String precioStr, 
-                                  String ubicacion, String fechaHoraStr, String capacidadStr, 
-                                  String idEntrenadorStr) {
+    
+    /**
+     * Se registra una clase en la DB
+     * @param tipo
+     * @param descripcion
+     * @param precioStr
+     * @param ubicacion
+     * @param fechaHoraStr
+     * @param capacidadStr
+     * @param idEntrenadorStr
+     * @return 
+     */
+  public boolean registrarClase(TipoClase tipo, String descripcion, String precioStr, String ubicacion, String fechaHoraStr, String capacidadStr, String idEntrenadorStr) {
         
         if (descripcion.trim().isEmpty() || ubicacion.trim().isEmpty() || fechaHoraStr.trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Descripción, Ubicación y Horario son obligatorios.");
@@ -67,11 +77,23 @@ public class ControladorClases {
             JOptionPane.showMessageDialog(null, "Clase registrada con éxito.");
             return true;
         } else {
-            JOptionPane.showMessageDialog(null, "Error al guardar (Verifique ID Entrenador).");
             return false;
         }
     }
 
+  /**
+   * Segun el Id de la clase si ya existe se actualizarala informacion de esta :p
+   * @param idClaseStr
+   * @param tipo
+   * @param descripcion
+   * @param precioStr
+   * @param ubicacion
+   * @param fechaHoraStr
+   * @param capacidadStr
+   * @param personasInscritasActuales
+   * @param idEntrenadorStr
+   * @return 
+   */
     public boolean actualizarClase(String idClaseStr, TipoClase tipo, String descripcion, String precioStr, 
                                    String ubicacion, String fechaHoraStr, String capacidadStr, 
                                    int personasInscritasActuales, String idEntrenadorStr) {
@@ -118,7 +140,6 @@ public class ControladorClases {
             JOptionPane.showMessageDialog(null, "Clase actualizada.");
             return true;
         } else {
-            JOptionPane.showMessageDialog(null, "Error al actualizar.");
             return false;
         }
     }
@@ -131,6 +152,11 @@ public class ControladorClases {
         return clasesDAO.verClasesPorTipo(tipo);
     }
     
+    /**
+     * Se elimina una clase en especifico por medio del ID
+     * @param idClaseStr
+     * @return 
+     */
     public boolean eliminarClase(String idClaseStr) {
         try {
             int id = Integer.parseInt(idClaseStr);

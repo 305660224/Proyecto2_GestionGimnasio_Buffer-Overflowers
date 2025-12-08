@@ -80,20 +80,19 @@ public class pnClientes extends javax.swing.JPanel {
             String fechaNacimiento = txtFechaNacimiento.getText().trim();
             String telefono = txtContactNumeroTelefono.getText().trim();
             String correo = txtCorreo.getText().trim();
-            int tipoMembresia = txtTipoMembresia.getSelectedIndex() + 1; // Ajusta según tu lógica
+            int tipoMembresia = txtTipoMembresia.getSelectedIndex() + 1;
             
-            boolean exito = controladorCliente.registrarCliente(
+            boolean registrado = controladorCliente.registrarCliente(
                 cedula, nombre, apellido1, apellido2, 
                 fechaNacimiento, telefono, correo, tipoMembresia
             );
             
-            if (exito) {
-                JOptionPane.showMessageDialog(this, "Cliente registrado exitosamente");
+            if (registrado) {
                 limpiarCampos();
                 cargarClientesEnTabla();
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al registrar cliente: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error en registro cliente: " + ex.getMessage());
         }
     }    
         
@@ -106,15 +105,24 @@ public class pnClientes extends javax.swing.JPanel {
             String fechaNacimiento = txtFechaNacimiento.getText().trim();
             String telefono = txtContactNumeroTelefono.getText().trim();
             String correo = txtCorreo.getText().trim();
-            int tipoMembresia = txtTipoMembresia.getSelectedIndex() + 1; // Ajusta según tu lógica
+            int tipoMembresia = txtTipoMembresia.getSelectedIndex() + 1;
             
-            boolean exito = controladorCliente.actualizarCliente(
+            boolean actualizado = controladorCliente.actualizarCliente(
                 cedula, nombre, apellido1, apellido2, 
                 fechaNacimiento, telefono, correo, tipoMembresia
             );
             
-            if (exito) {
-                JOptionPane.showMessageDialog(this, "Cliente actualizado exitosamente");
+            if (actualizado) {
+                JOptionPane.showMessageDialog(this, "              Cliente actualizado! \n" +
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀\n" +
+                "⠀⠀⠀⠀⢀⡴⣆⠀⠀⠀⠀⠀⣠⡀⠀⠀⠀⠀⠀⠀⣼⣿⡗⠀⠀⠀⠀\n" +
+                "⠀⠀⠀⣠⠟⠀⠘⠷⠶⠶⠶⠾⠉⢳⡄⠀⠀⠀⠀⠀⣧⣿⠀⠀⠀⠀⠀\n" +
+                "⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣤⣤⣤⣤⣤⣿⢿⣄⠀⠀⠀⠀\n" +
+                "⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠀⠀⠀⠀⠀⠀⠙⣷⡴⠶⣦\n" +
+                "⠀⠀⢱⡀⠀⠉⠉⠀⠀⠀⠀⠛⠃⠀⢠⡟⠀⠀⠀⢀⣀⣠⣤⠿⠞⠛⠋\n" +
+                "⣠⠾⠋⠙⣶⣤⣤⣤⣤⣤⣀⣠⣤⣾⣿⠴⠶⠚⠋⠉⠁⠀⠀⠀⠀⠀⠀\n" +
+                "⠛⠒⠛⠉⠉⠀⠀⠀⣴⠟⢃⡴⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠛⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
                 cargarClientesEnTabla();
             } else {
                 JOptionPane.showMessageDialog(this, "No se pudo actualizar el cliente");
@@ -125,14 +133,13 @@ public class pnClientes extends javax.swing.JPanel {
     }    
         
         private void buscarCliente() {
-        String cedula = JOptionPane.showInputDialog(this, "Ingrese la cédula a buscar:");
+        String cedula = JOptionPane.showInputDialog(this, "Ingrese iD para buscar:");
         
         if (cedula != null && !cedula.trim().isEmpty()) {
             Cliente cliente = controladorCliente.buscarCliente(cedula.trim());
             
             if (cliente != null) {
                 mostrarClienteEnCampos(cliente);
-                JOptionPane.showMessageDialog(this, "Cliente encontrado");
             } else {
                 JOptionPane.showMessageDialog(this, "Cliente no encontrado");
                 limpiarCampos();
@@ -146,7 +153,6 @@ public class pnClientes extends javax.swing.JPanel {
         txtApellido1.setText(cliente.getPrimerApellido());
         txtApellido2.setText(cliente.getSegundoApellido());
         
-        // Formatear fecha
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaFormateada = cliente.getFechaNacimiento().format(formatter);
         txtFechaNacimiento.setText(fechaFormateada);
@@ -154,14 +160,13 @@ public class pnClientes extends javax.swing.JPanel {
         txtContactNumeroTelefono.setText(cliente.getTelefono());
         txtCorreo.setText(cliente.getCorreo());
         
-        // Ajustar combo box según el tipo de membresía
         int index = cliente.getTipoMembresia() - 1;
         if (index >= 0 && index < txtTipoMembresia.getItemCount()) {
             txtTipoMembresia.setSelectedIndex(index);
         }
     }    
         
-            private void eliminarCliente() {
+        private void eliminarCliente() {
         int filaSeleccionada = jTable1.getSelectedRow();
         
         if (filaSeleccionada == -1) {
@@ -179,7 +184,11 @@ public class pnClientes extends javax.swing.JPanel {
                 "¿Está seguro de eliminar al cliente:\n" +
                 "Cédula: " + cedula + "\n" +
                 "Nombre: " + nombreCliente + " " + apellidoCliente + "\n\n" +
-                "¡ADVERTENCIA! Esto también eliminará TODOS los pagos relacionados con este cliente.",
+                "Tambien se eliminaran pagos relacionados\n" +
+"                                 ╱|、          \n" +
+"                                 (˚ˎ 。7        \n" +
+"                                 |、 ˜〵         \n" +
+"                                 じしˍ,)ノ",
                 "Confirmar eliminación",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE
@@ -189,8 +198,6 @@ public class pnClientes extends javax.swing.JPanel {
                 boolean exito = controladorCliente.eliminarCliente(cedula);
                 
                 if (exito) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Cliente y sus pagos relacionados eliminados exitosamente");
                     limpiarCampos();
                     cargarClientesEnTabla();
                 } else {
@@ -204,13 +211,10 @@ public class pnClientes extends javax.swing.JPanel {
     }
         
     private void cargarClientesEnTabla() {
-        // Limpiar tabla
-        tableModel.setRowCount(0);
-        
-        // Obtener clientes del controlador
+        tableModel.setRowCount(0);       
         List<Cliente> clientes = controladorCliente.listarClientes();
         
-        // Formateador de fecha
+        // Pasar a formato de fecha
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         
         // Agregar clientes a la tabla
@@ -441,8 +445,7 @@ public class pnClientes extends javax.swing.JPanel {
                                     .addComponent(jLabel2)
                                     .addComponent(jLabel4))
                                 .addGap(74, 74, 74)
-                                .addComponent(jLabel9)
-                                .addGap(326, 326, 326))
+                                .addComponent(jLabel9))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -492,9 +495,9 @@ public class pnClientes extends javax.swing.JPanel {
                     .addComponent(txtApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtFechaNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jLabel8))

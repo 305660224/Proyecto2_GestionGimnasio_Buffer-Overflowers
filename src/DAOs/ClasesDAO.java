@@ -22,7 +22,7 @@ public class ClasesDAO {
     }
 
     public boolean registrarClase(Clases clase) {
-        String sql = "{CALL registrar_clase(?, ?, ?, ?, ?, ?, ?, ?)}"; 
+        String sql = "{CALL registrar_clase(?, ?, ?, ?, ?, ?, ?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setString(1, clase.getTipoClase().getNombreBD());
             cs.setString(2, clase.getDescripcion());
@@ -30,8 +30,7 @@ public class ClasesDAO {
             cs.setString(4, clase.getUbicacion());
             cs.setTimestamp(5, Timestamp.valueOf(clase.getHorario())); 
             cs.setInt(6, clase.getCapacidadMax());
-            cs.setInt(7, clase.getPersonasInscritas());
-            cs.setInt(8, clase.getIdEntrenador());
+            cs.setInt(7, clase.getIdEntrenador());
 
             int filas = cs.executeUpdate();
             return filas > 0;

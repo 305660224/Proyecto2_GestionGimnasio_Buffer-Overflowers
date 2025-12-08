@@ -17,7 +17,7 @@ public class ControladorUsuario {
     private UsuarioDAO usuarioDAO;
     
     public ControladorUsuario(){
-       this.usuarioDAO = usuarioDAO;
+       this.usuarioDAO = new UsuarioDAO(); 
     }
      
     /**
@@ -63,19 +63,29 @@ public class ControladorUsuario {
     }
 
     public boolean actualizarUsuario(int id, String usuario, String passwordPlana, int idRol) {
-        Usuario u = new Usuario();
-        u.setIdusuario(id);
-        u.setUsuario(usuario);
+         Usuario u = new Usuario();
+    u.setIdusuario(id);
+    u.setUsuario(usuario);
 
-        if (passwordPlana != null && !passwordPlana.isEmpty()) {
-            u.setContrasena(Seguridad.encriptar(passwordPlana));
+    if (passwordPlana != null && !passwordPlana.isEmpty()) {
+        u.setContrasena(Seguridad.encriptar(passwordPlana));
+    } else {
+        Usuario usuarioExistente = buscarPorId(id);
+        if (usuarioExistente != null) {
+            u.setContrasena(usuarioExistente.getContrasena());
         } else {
-             u.setContrasena(Seguridad.encriptar(passwordPlana));
+
+            u.setContrasena(Seguridad.encriptar(""));
         }
-        
-        u.setIdRol(EnumRol.porId(idRol));
-        
-        return usuarioDAO.actualizar(u);
     }
+    
+    u.setIdRol(EnumRol.porId(idRol));
+    
+    return usuarioDAO.actualizar(u);
+}
+
+public Usuario buscarPorId(int id) {
+    return usuarioDAO.buscarPorId(id);
+}
   
 }

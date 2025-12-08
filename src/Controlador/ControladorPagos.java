@@ -8,6 +8,7 @@ import Modelo.Pago;
 import DAOs.PagoDAO;
 import DTOs.PagoDTO;
 import Mappers.PagoMapper;
+import Modelo.Cliente;
 import Utilidades.GeneradorPDF;
 import Utilidades.GeneradorXML;
 import java.awt.Desktop;
@@ -166,12 +167,30 @@ public boolean eliminarPago(int idPago) {
         }
     }
 
-    /**
-     * ELIMINAR XXXXXXXXXXXXXXXX
-     */
-    private String obtenerNombreCliente(String cedulaCliente) {
-       if ("102345678".equals(cedulaCliente)) return "Laura Soto Ramirez";
-        if ("71234567890".equals(cedulaCliente)) return "Pedro Lopez Mora";
-        return "Cliente con cédula: " + cedulaCliente;
-    }
+private String obtenerNombreCliente(String cedula) {
+    ControladorCliente controladorCliente = new ControladorCliente();
+    Cliente cliente = controladorCliente.buscarCliente(cedula);
+    
+    if (cliente != null) {
+        String nombreCompleto = "";
+        
+        if (cliente.getNombre() != null && !cliente.getNombre().trim().isEmpty()) {
+            nombreCompleto = cliente.getNombre().trim();
+        }       
+        if (cliente.getPrimerApellido() != null && !cliente.getPrimerApellido().trim().isEmpty()) {
+            if (!nombreCompleto.isEmpty()) {
+                nombreCompleto = nombreCompleto + " ";
+            }
+            nombreCompleto = nombreCompleto + cliente.getPrimerApellido().trim();
+        }        
+        if (cliente.getSegundoApellido() != null && !cliente.getSegundoApellido().trim().isEmpty()) {
+            if (!nombreCompleto.isEmpty()) {
+                nombreCompleto = nombreCompleto + " ";
+            }
+            nombreCompleto = nombreCompleto + cliente.getSegundoApellido().trim();
+        }
+        return !nombreCompleto.isEmpty() ? nombreCompleto : cedula;
+    }   
+    return cedula;
+}
 }
