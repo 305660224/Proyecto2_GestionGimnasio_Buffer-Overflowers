@@ -22,13 +22,13 @@ public class ClienteDAO {
     }
 
     public boolean registrarCliente(Cliente cliente) {
-        String sql = "{CALL agregar_cliente(?, ?, ?, ?, ?, ?, ?, ?)}"; // Procedimiento almacenado para registrar cliente
+        String sql = "{CALL agregar_cliente(?, ?, ?, ?, ?, ?, ?, ?)}";
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setString(1, cliente.getCedula());
             cs.setString(2, cliente.getNombre());
             cs.setString(3, cliente.getPrimerApellido());
             cs.setString(4, cliente.getSegundoApellido());
-            cs.setDate(5, Date.valueOf(cliente.getFechaNacimiento())); // Convertir a Date
+            cs.setDate(5, Date.valueOf(cliente.getFechaNacimiento())); 
             cs.setString(6, cliente.getTelefono());
             cs.setString(7, cliente.getCorreo());
             cs.setInt(8, cliente.getTipoMembresia());
@@ -42,7 +42,7 @@ public class ClienteDAO {
     }
 
     public Cliente buscarPorId(String cedula) {
-        String sql = "{CALL ver_cliente(?)}"; // Procedimiento almacenado para buscar cliente por cédula
+        String sql = "{CALL ver_cliente(?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setString(1, cedula);
             ResultSet rs = cs.executeQuery();
@@ -66,7 +66,7 @@ public class ClienteDAO {
 
     public List<Cliente> listarTodos() {
         List<Cliente> lista = new ArrayList<>();
-        String sql = "{CALL ver_clientes()}"; // Procedimiento almacenado para listar todos los clientes
+        String sql = "{CALL ver_clientes()}";
         try (CallableStatement cs = conexion.prepareCall(sql); 
              ResultSet rs = cs.executeQuery()) {
             while (rs.next()) {
@@ -88,13 +88,13 @@ public class ClienteDAO {
     }
 
     public boolean actualizarCliente(Cliente cliente) {
-        String sql = "{CALL actualizar_cliente(?, ?, ?, ?, ?, ?, ?, ?)}"; // Procedimiento almacenado para actualizar cliente
+        String sql = "{CALL actualizar_cliente(?, ?, ?, ?, ?, ?, ?, ?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setString(1, cliente.getCedula());
             cs.setString(2, cliente.getNombre());
             cs.setString(3, cliente.getPrimerApellido());
             cs.setString(4, cliente.getSegundoApellido());
-            cs.setDate(5, Date.valueOf(cliente.getFechaNacimiento())); // Convertir a Date
+            cs.setDate(5, Date.valueOf(cliente.getFechaNacimiento())); 
             cs.setString(6, cliente.getTelefono());
             cs.setString(7, cliente.getCorreo());
             cs.setInt(8, cliente.getTipoMembresia());
@@ -108,7 +108,7 @@ public class ClienteDAO {
     }
 
     public boolean eliminarCliente(String cedula) {
-        String sql = "{CALL eliminar_cliente(?)}"; // Procedimiento almacenado para eliminar cliente por cédula
+        String sql = "{CALL eliminar_cliente(?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setString(1, cedula);
             int filas = cs.executeUpdate();
