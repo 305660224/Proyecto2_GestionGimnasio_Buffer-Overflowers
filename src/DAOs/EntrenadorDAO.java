@@ -24,13 +24,14 @@ public class EntrenadorDAO {
     }
 
     public boolean registrarEntrenador(Entrenador entrenador) {
-        String sql = "{CALL agregar_entrenador(?, ?, ?, ?, ?)}"; 
+        String sql = "{CALL agregar_entrenador(?, ?, ?, ?, ?, ?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setString(1, entrenador.getNombre());
             cs.setString(2, entrenador.getPrimerApellido());
             cs.setString(3, entrenador.getSegundoApellido());
             cs.setString(4, entrenador.getTelefono());
             cs.setString(5, entrenador.getCorreo());
+            cs.setString(6,entrenador.getEspecialidades());
 
             int filas = cs.executeUpdate();
             return filas > 0;
@@ -85,7 +86,7 @@ public class EntrenadorDAO {
     }
 
     public boolean actualizarEntrenador(Entrenador entrenador) {
-        String sql = "{CALL actualizar_entrenador(?, ?, ?, ?, ?, ?)}"; 
+        String sql = "{CALL actualizar_entrenador(?, ?, ?, ?, ?, ?, ?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setInt(1, entrenador.getIdEntrenador());
             cs.setString(2, entrenador.getNombre());
@@ -93,6 +94,7 @@ public class EntrenadorDAO {
             cs.setString(4, entrenador.getSegundoApellido());
             cs.setString(5, entrenador.getTelefono());
             cs.setString(6, entrenador.getCorreo());
+            cs.setString(7, entrenador.getEspecialidades());
 
             int filas = cs.executeUpdate();
             return filas > 0;
