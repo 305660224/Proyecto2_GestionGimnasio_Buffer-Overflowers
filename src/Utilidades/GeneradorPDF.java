@@ -17,7 +17,6 @@ public class GeneradorPDF {
     public static void generarComprobantePago(String ruta, int idPago, String cliente, Date fecha, double subtotal, double impuesto, double total) {
         
         try {
-            // Cambiamos extensión a .html temporalmente
             String rutaHTML = ruta.replace(".pdf", ".html");
             
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -42,7 +41,7 @@ public class GeneradorPDF {
                 </head>
                 <body>
                     <div class="factura">
-                        <div class="titulo">GIMNASIO UTN - COMPROBANTE DE PAGO</div>
+                        <div class="titulo">GIMNASIO SMARTFIT - COMPROBANTE DE PAGO</div>
                         
                         <div class="info">
                             <div><strong>Número de Factura:</strong> %d</div>
@@ -53,26 +52,25 @@ public class GeneradorPDF {
                         <table>
                             <tr>
                                 <th>Descripción</th>
-                                <th>Monto (₡)</th>
+                                <th>Monto</th>
                             </tr>
                             <tr>
                                 <td>Subtotal</td>
-                                <td>%,.2f</td>
+                                <td>%,.2f₡</td>
                             </tr>
                             <tr>
-                                <td>Impuesto (13%%)</td>
-                                <td>%,.2f</td>
+                                <td>Impuesto (%)</td>
+                                <td>%,.2f₡</td>
                             </tr>
                             <tr class="total-row">
                                 <td>TOTAL</td>
-                                <td>%,.2f</td>
+                                <td>%,.2f₡</td>
                             </tr>
                         </table>
                         
                         <div class="footer">
                             <p>Gracias por su preferencia</p>
-                            <p>Factura generada automáticamente por el sistema</p>
-                            <p><strong>IMPORTANTE:</strong> Para obtener PDF, imprima esta página y seleccione "Guardar como PDF"</p>
+                            <p>Factura generada automáticamente</p>
                         </div>
                     </div>
                 </body>

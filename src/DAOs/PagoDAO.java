@@ -35,13 +35,18 @@ public class PagoDAO {
         }
         return false;
     }
-
-    public boolean eliminarPago(int idPago) {
-        String sql = "{CALL eliminar_pago(?)}"; 
-        try (CallableStatement cs = conexion.prepareCall(sql)) {
-            cs.setInt(1, idPago);
-            int filas = cs.executeUpdate();
-            return filas > 0;
+    
+     public boolean eliminarPago(int idPago) {
+        String sql = "DELETE FROM historialpagos WHERE idPago = ?";
+        
+        try (Connection conn = ConexionBD.getInstancia().getConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idPago);
+            int filasAfectadas = pstmt.executeUpdate();
+            
+            return filasAfectadas > 0; // Retorna true si se eliminó al menos una fila
+            
         } catch (SQLException e) {
             System.err.println("Error eliminando pago: " + e.getMessage());
         }

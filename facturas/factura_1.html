@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Factura #1 - Gimnasio UTN</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .factura { border: 2px solid #333; padding: 30px; max-width: 600px; margin: 0 auto; }
+        .titulo { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
+        .info { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; }
+        th { background: #f2f2f2; text-align: left; padding: 12px; border-bottom: 2px solid #333; }
+        td { padding: 10px 12px; border-bottom: 1px solid #ddd; }
+        .total-row { font-weight: bold; font-size: 16px; background: #e8f4ff; }
+        .footer { margin-top: 40px; text-align: center; font-style: italic; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="factura">
+        <div class="titulo">GIMNASIO UTN - COMPROBANTE DE PAGO</div>
+
+        <div class="info">
+            <div><strong>Número de Factura:</strong> 1</div>
+            <div><strong>Fecha:</strong> 07/12/2025 00:00</div>
+            <div><strong>Cliente:</strong> Laura Soto Ramirez</div>
+        </div>
+
+        <table>
+            <tr>
+                <th>Descripción</th>
+                <th>Monto</th>
+            </tr>
+            <tr>
+                <td>Subtotal</td>
+                <td>13 000,00₡</td>
+            </tr>
+            <tr>
+                <td>Impuesto (13%)</td>
+                <td>1 690,00₡</td>
+            </tr>
+            <tr class="total-row">
+                <td>TOTAL</td>
+                <td>14 690,00₡</td>
+            </tr>
+        </table>
+
+        <div class="footer">
+            <p>Gracias por su preferencia</p>
+            <p>Factura generada automáticamente</p>
+        </div>
+    </div>
+</body>
+</html>

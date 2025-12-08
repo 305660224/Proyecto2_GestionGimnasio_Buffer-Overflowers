@@ -6,6 +6,7 @@ package Vistas;
 
 import Controlador.ControladorPagos;
 import DTOs.PagoDTO;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -17,32 +18,77 @@ import javax.swing.table.DefaultTableModel;
  */
 public class pnPagos extends javax.swing.JPanel {
  private ControladorPagos controladorPagos;
+private DefaultTableModel modelo;
+double total;
     /**
      * Creates new form pnPagos
      */
     public pnPagos() {
         initComponents();
-        controladorPagos = new ControladorPagos(); // Inicializamos el controlador
-        cargarTablaPagos();  // Cargar los pagos al iniciar
+        inicializarComponentes();
+        controladorPagos = new ControladorPagos();
+        cargarTablaPagos();
     }
-// Método para cargar pagos en la tabla
-    private void cargarTablaPagos() {
-        List<PagoDTO> pagosDTO = controladorPagos.obtenerTodosLosPagos();
-        DefaultTableModel modelo = (DefaultTableModel) tblPagos.getModel();
-        modelo.setRowCount(0); // Limpiar tabla antes de cargar los nuevos datos
+    
+     private void inicializarComponentes() {
+        // Configurar modelo de tabla
+        modelo = new DefaultTableModel(
+            new Object[][]{},
+            new String[]{"ID", "Cédula", "Cliente", "Fecha", "Subtotal", "Impuesto", "Total"}
+        );
+        tblPagos.setModel(modelo);
         
-        for (PagoDTO pagoDTO : pagosDTO) {
-            modelo.addRow(new Object[] {
-                pagoDTO.getIdPago(),
-                pagoDTO.getCedulaCliente(),
-                pagoDTO.getNombreCliente(),
-                pagoDTO.getFechaPago(),
-                pagoDTO.getSubtotal(),
-                pagoDTO.getImpuesto(),
-                pagoDTO.getTotal()
-            });
-        }
+        // Configurar fecha actual
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        txtFechaPago.setText(sdf.format(new Date()));
+        
     }
+     
+         private void cargarTablaPagos() {
+        try {
+            List<PagoDTO> pagosDTO = controladorPagos.obtenerTodosLosPagos();
+            modelo.setRowCount(0); // Limpiar tabla antes de cargar los nuevos datos
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            
+            for (PagoDTO pagoDTO : pagosDTO) {
+                modelo.addRow(new Object[] {
+                    pagoDTO.getIdPago(),
+                    pagoDTO.getCedulaCliente(),
+                    pagoDTO.getNombreCliente(),
+                    pagoDTO.getFechaPago() != null ? sdf.format(pagoDTO.getFechaPago()) : "",
+                    String.format("₡%.2f", pagoDTO.getSubtotal()),
+                    String.format("₡%.2f", pagoDTO.getImpuesto()),
+                    String.format("₡%.2f", pagoDTO.getTotal())
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar pagos: " + e.getMessage());
+        }
+        
+        
+    }
+         
+    private void limpiarCampos() {
+        txtCedulaCliente.setText("");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        txtFechaPago.setText(sdf.format(new Date()));
+        txtTotal.setText("");
+        btnGenerarFactura.setSelected(false);
+    }
+    
+    private void cargarTotal() {
+            String cedulaCliente = txtCedulaCliente.getText().trim();
+            String fechaTexto = txtFechaPago.getText().trim();
+            String impuesto = txtImpuesto.getText().trim();
+            String subtotal = txtSubtotal.getText().trim();
+            
+            double imp = Double.parseDouble(impuesto)/100;
+            double sub = Double.parseDouble(subtotal);
+            total = sub+(sub*imp);
+            txtTotal.setText(String.valueOf(total));
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -61,14 +107,15 @@ public class pnPagos extends javax.swing.JPanel {
         tblPagos = new javax.swing.JTable();
         txtCedulaCliente = new javax.swing.JTextField();
         txtFechaPago = new javax.swing.JTextField();
-        txtTotalAPagar = new javax.swing.JTextField();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        txtTotal = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        chkGenerarPDF = new javax.swing.JCheckBox();
-        chkGenerarXML = new javax.swing.JCheckBox();
+        btnGenerarFactura = new javax.swing.JCheckBox();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        txtSubtotal = new javax.swing.JTextField();
+        txtImpuesto = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(0, 0, 0));
         setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -92,12 +139,22 @@ public class pnPagos extends javax.swing.JPanel {
         btnActualizar.setForeground(new java.awt.Color(255, 255, 255));
         btnActualizar.setText("Actualizar");
         btnActualizar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarActionPerformed(evt);
+            }
+        });
 
         btnBuscar.setBackground(new java.awt.Color(0, 0, 0));
         btnBuscar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnBuscar.setForeground(new java.awt.Color(255, 255, 255));
         btnBuscar.setText("Buscar");
         btnBuscar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
 
         btnEliminar.setBackground(new java.awt.Color(0, 0, 0));
         btnEliminar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -156,18 +213,16 @@ public class pnPagos extends javax.swing.JPanel {
 
         txtFechaPago.setBackground(new java.awt.Color(255, 204, 0));
         txtFechaPago.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtFechaPago.setEnabled(false);
         txtFechaPago.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtFechaPagoActionPerformed(evt);
             }
         });
 
-        txtTotalAPagar.setBackground(new java.awt.Color(255, 204, 0));
-        txtTotalAPagar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        jComboBox2.setBackground(new java.awt.Color(255, 204, 0));
-        jComboBox2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        txtTotal.setBackground(new java.awt.Color(255, 204, 0));
+        txtTotal.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtTotal.setEnabled(false);
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -184,19 +239,38 @@ public class pnPagos extends javax.swing.JPanel {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Total");
 
-        jLabel6.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel6.setText("jLabel6");
-
-        chkGenerarPDF.setBackground(new java.awt.Color(255, 204, 0));
-        chkGenerarPDF.setText("PDF");
-
-        chkGenerarXML.setBackground(new java.awt.Color(255, 204, 0));
-        chkGenerarXML.setText("XML");
-        chkGenerarXML.addActionListener(new java.awt.event.ActionListener() {
+        btnGenerarFactura.setBackground(new java.awt.Color(255, 204, 0));
+        btnGenerarFactura.setForeground(new java.awt.Color(255, 255, 255));
+        btnGenerarFactura.setText("Imprimir Factura");
+        btnGenerarFactura.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkGenerarXMLActionPerformed(evt);
+                btnGenerarFacturaActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Subtotal");
+
+        jLabel4.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("Impuesto");
+
+        txtSubtotal.setBackground(new java.awt.Color(255, 204, 0));
+        txtSubtotal.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtSubtotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSubtotalActionPerformed(evt);
+            }
+        });
+
+        txtImpuesto.setBackground(new java.awt.Color(255, 204, 0));
+        txtImpuesto.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtImpuesto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtImpuestoActionPerformed(evt);
             }
         });
 
@@ -213,28 +287,32 @@ public class pnPagos extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(39, 39, 39)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(txtCedulaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6)
-                            .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(txtFechaPago, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5)
-                            .addComponent(txtTotalAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnGenerarFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jLabel1)
+                                                .addComponent(txtCedulaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addGap(31, 31, 31))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addComponent(jLabel3)
+                                            .addGap(196, 196, 196))
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(txtFechaPago, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(31, 31, 31)))
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel2)
+                                        .addComponent(txtSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtImpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel4))
+                                    .addGap(31, 31, 31))))))
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(445, 445, 445)
-                .addComponent(chkGenerarXML, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(chkGenerarPDF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(39, 39, 39))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -245,102 +323,202 @@ public class pnPagos extends javax.swing.JPanel {
                         .addGap(12, 12, 12)
                         .addComponent(jLabel1)
                         .addGap(6, 6, 6)
-                        .addComponent(txtCedulaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addGap(6, 6, 6)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(11, 11, 11)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtCedulaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(11, 11, 11)
                         .addComponent(jLabel3)
                         .addGap(6, 6, 6)
                         .addComponent(txtFechaPago, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel5)
+                        .addComponent(jLabel2)
                         .addGap(6, 6, 6)
-                        .addComponent(txtTotalAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(139, 139, 139)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkGenerarPDF)
-                    .addComponent(chkGenerarXML))
+                        .addComponent(txtSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel4)
+                        .addGap(5, 5, 5)
+                        .addComponent(txtImpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(98, 98, 98)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnGenerarFactura)
+                    .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-   // Obtener los datos del formulario
-        String cedulaCliente = txtCedulaCliente.getText().trim();
-        Date fechaPago = new java.sql.Date(txtFechaPago.getDate().getTime());
-        double totalAPagar = Double.parseDouble(txtTotalAPagar.getText());
-        boolean generarPDF = chkGenerarPDF.isSelected();
-        boolean generarXML = chkGenerarXML.isSelected();
+                try {
+            String cedulaCliente = txtCedulaCliente.getText().trim();
+            String fechaTexto = txtFechaPago.getText().trim();
+            double impuesto = Double.parseDouble(txtImpuesto.getText().trim());
+            double subtotal = Double.parseDouble(txtSubtotal.getText().trim());
+            
+            // Validaciones básicas
+            if (cedulaCliente.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Ingrese la cédula del cliente");
+                return;
+            }
+            
+            if (fechaTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Ingrese la fecha de pago");
+                return;
+            }
+            
+            
+            if (impuesto == 0) {
+                JOptionPane.showMessageDialog(this, "Ingrese el impuesto");
+                return;
+            }
+            
+            if (subtotal == 0) {
+                JOptionPane.showMessageDialog(this, "Ingrese el subtotal");
+                return;
+            }
+            
+            // Convertir datos
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date fechaPago = sdf.parse(fechaTexto);
+            cargarTotal();
+            
+            boolean ImprimirFactura = btnGenerarFactura.isSelected();
+            
+            // Registrar pago controlador
+            boolean pagoRegistrado = controladorPagos.registrarPago(
+                cedulaCliente, 
+                fechaPago, 
+                subtotal, 
+                impuesto,
+                ImprimirFactura, 
+                ImprimirFactura
+            );
 
-        // Registrar pago a través del controlador
-        boolean pagoRegistrado = controladorPagos.registrarPago(cedulaCliente, fechaPago, totalAPagar, generarPDF, generarXML);
-
-        if (pagoRegistrado) {
-            JOptionPane.showMessageDialog(this, "Pago registrado correctamente.");
-            cargarTablaPagos();  // Actualizar la tabla de pagos
-        } else {
-            JOptionPane.showMessageDialog(this, "Hubo un error al registrar el pago.");
+            if (pagoRegistrado) {
+                JOptionPane.showMessageDialog(this, "Pago registrado correctamente.");
+                limpiarCampos();
+                cargarTablaPagos();  // Actualizar la tabla de pagos
+            } else {
+                JOptionPane.showMessageDialog(this, "Hubo un error al registrar el pago.");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El total debe ser un número válido");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
-    private void chkGenerarXMLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkGenerarXMLActionPerformed
+    private void btnGenerarFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarFacturaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_chkGenerarXMLActionPerformed
+    }//GEN-LAST:event_btnGenerarFacturaActionPerformed
 
     private void txtFechaPagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFechaPagoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtFechaPagoActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-                                                
-    // Obtener el ID del pago ingresado en el campo de búsqueda
-    String idPagoStr = txtCedulaCliente.getText().trim();
-
-    // Verificar si el ID no está vacío
-    if (idPagoStr.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Por favor, ingrese un ID de pago válido.");
-        return;
-    }
-
-    int idPago = Integer.parseInt(idPagoStr);  // Convertir a int
-
-    // Eliminar el pago usando el controlador
-    //ControladorPagos controladorPagos = new ControladorPagos();
-   // boolean eliminado = controladorPagos.eliminarPago(idPago);
-
-    if (eliminado) {
-        JOptionPane.showMessageDialog(this, "Pago eliminado correctamente.");
-        cargarTablaPagos();  // Actualizar la tabla de pagos
-    } else {
-        JOptionPane.showMessageDialog(this, "Error al eliminar el pago.");
-    }
-
-
+        int filaSeleccionada = tblPagos.getSelectedRow();
+        
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un pago de la tabla para eliminar");
+            return;
+        }
+        
+        try {
+            int idPago = (int) modelo.getValueAt(filaSeleccionada, 0);
+            String nombreCliente = (String) modelo.getValueAt(filaSeleccionada, 2);
+            
+            int confirmacion = JOptionPane.showConfirmDialog(
+                this, 
+                "¿Está seguro de eliminar el pago ID: " + idPago + 
+                " del cliente: " + nombreCliente + "?", 
+                "Confirmar eliminación", 
+                JOptionPane.YES_NO_OPTION
+            );
+            
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                boolean eliminado = controladorPagos.eliminarPago(idPago);
+                
+                if (eliminado) {
+                    JOptionPane.showMessageDialog(this, "Pago eliminado correctamente.");
+                    cargarTablaPagos();  // Actualizar la tabla de pagos
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al eliminar el pago.");
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al eliminar pago: " + e.getMessage());
+        }                                         
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+         String cedulaBuscada = txtCedulaCliente.getText().trim();
+        
+        if (cedulaBuscada.isEmpty()) {
+            cargarTablaPagos();
+            return;
+        }
+        
+        try {
+            List<PagoDTO> pagosDTO = controladorPagos.obtenerTodosLosPagos();
+            modelo.setRowCount(0);
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            
+            for (PagoDTO pagoDTO : pagosDTO) {
+                if (pagoDTO.getCedulaCliente().contains(cedulaBuscada)) {
+                    modelo.addRow(new Object[] {
+                        pagoDTO.getIdPago(),
+                        pagoDTO.getCedulaCliente(),
+                        pagoDTO.getNombreCliente(),
+                        pagoDTO.getFechaPago() != null ? sdf.format(pagoDTO.getFechaPago()) : "",
+                        String.format("₡%.2f", pagoDTO.getSubtotal()),
+                        String.format("₡%.2f", pagoDTO.getImpuesto()),
+                        String.format("₡%.2f", pagoDTO.getTotal())
+                    });
+                }
+            }
+            
+            if (modelo.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "No se encontraron pagos para la cédula: " + cedulaBuscada);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al buscar pagos: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
+        cargarTablaPagos();
+        JOptionPane.showMessageDialog(this, "Tabla actualizada");
+    }//GEN-LAST:event_btnActualizarActionPerformed
+
+    private void txtImpuestoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtImpuestoActionPerformed
+        cargarTotal();
+    }//GEN-LAST:event_txtImpuestoActionPerformed
+
+    private void txtSubtotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSubtotalActionPerformed
+        cargarTotal();
+    }//GEN-LAST:event_txtSubtotalActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JCheckBox btnGenerarFactura;
     private javax.swing.JButton btnGuardar;
-    private javax.swing.JCheckBox chkGenerarPDF;
-    private javax.swing.JCheckBox chkGenerarXML;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblPagos;
     private javax.swing.JTextField txtCedulaCliente;
     private javax.swing.JTextField txtFechaPago;
-    private javax.swing.JTextField txtTotalAPagar;
+    private javax.swing.JTextField txtImpuesto;
+    private javax.swing.JTextField txtSubtotal;
+    private javax.swing.JTextField txtTotal;
     // End of variables declaration//GEN-END:variables
+
 }
