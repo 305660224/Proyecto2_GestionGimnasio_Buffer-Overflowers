@@ -38,7 +38,7 @@ public class PagoMapper {
      * @param dto
      * @return 
      */
-    public static Pago toModel(PagoDTO dto) {
+    public static Pago toEntity(PagoDTO dto) {
         if (dto == null) return null;
         
         return new Pago(
@@ -71,12 +71,12 @@ public class PagoMapper {
      * @param dtos
      * @return 
      */
-    public static List<Pago> toModelList(List<PagoDTO> dtos) {
+    public static List<Pago> toEntityList(List<PagoDTO> dtos) {
         if (dtos == null) return null;
         
         List<Pago> pagos = new ArrayList<>();
         for (PagoDTO dto : dtos) {
-            pagos.add(toModel(dto));
+            pagos.add(toEntity(dto));
         }
         return pagos;
     }

@@ -35,7 +35,7 @@ public class ClasesMapper {
         return dto;
     }
 
-    public static Clases toModel(ClasesDTO dto) {
+    public static Clases toEntity(ClasesDTO dto) {
         if (dto == null) return null;
 
         TipoClase tipoClase = TipoClase.fromString(dto.getTipoClase());  
@@ -66,12 +66,12 @@ public class ClasesMapper {
         return dtos;
     }
 
-    public static List<Clases> toModelList(List<ClasesDTO> dtos) {
+    public static List<Clases> toEntityList(List<ClasesDTO> dtos) {
         if (dtos == null) return null;
 
         List<Clases> clases = new ArrayList<>();
         for (ClasesDTO dto : dtos) {
-            clases.add(toModel(dto));
+            clases.add(toEntity(dto));
         }
         return clases;
     }
