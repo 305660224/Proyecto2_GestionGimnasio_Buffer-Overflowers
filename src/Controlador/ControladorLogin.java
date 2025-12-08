@@ -6,7 +6,7 @@ package Controlador;
 import Modelo.Usuario;
 import Modelo.SesionUsuario;
 import Modelo.UsuarioIN;
-import Modelo.UsuarioDAO;
+import DAOs.UsuarioDAO;
 import Utilidades.Seguridad;
 /**
  *

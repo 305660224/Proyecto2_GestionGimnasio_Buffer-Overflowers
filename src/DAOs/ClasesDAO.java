@@ -4,6 +4,7 @@
  */
 package DAOs;
 import Modelo.Clases;
+import Modelo.TipoClase;
 import Utilidades.ConexionBD;
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
  *
  * @author huete
  */
+
 public class ClasesDAO {
     private final Connection conexion;
 
@@ -20,17 +22,18 @@ public class ClasesDAO {
     }
 
     public boolean registrarClase(Clases clase) {
-        String sql = "INSERT INTO clases (tipoClase, descripcion, precio, ubicacion, horario, capacidad) VALUES (?, ?, ?, ?, ?, ?,?)";
-        try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, clase.getTipoClase());
-            ps.setString(2, clase.getDescripcion());
-            ps.setDouble(3, clase.getPrecio());
-            ps.setString(4, clase.getUbicacion());
-            ps.setTimestamp(5, Timestamp.valueOf(clase.getHorario())); // Convertir a Timestamp
-            ps.setInt(6, clase.getCapacidadMax());
-            ps.setInt(7, clase.getIdEntrenador());
+        String sql = "{CALL registrar_clase(?, ?, ?, ?, ?, ?, ?, ?)}"; 
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setString(1, clase.getTipoClase().getNombreBD());
+            cs.setString(2, clase.getDescripcion());
+            cs.setDouble(3, clase.getPrecio());
+            cs.setString(4, clase.getUbicacion());
+            cs.setTimestamp(5, Timestamp.valueOf(clase.getHorario())); 
+            cs.setInt(6, clase.getCapacidadMax());
+            cs.setInt(7, clase.getPersonasInscritas());
+            cs.setInt(8, clase.getIdEntrenador());
 
-            int filas = ps.executeUpdate();
+            int filas = cs.executeUpdate();
             return filas > 0;
         } catch (SQLException e) {
             System.err.println("Error registrando clase: " + e.getMessage());
@@ -38,43 +41,49 @@ public class ClasesDAO {
         return false;
     }
 
-    public Clases buscarPorId(int idClase) {
-        String sql = "SELECT * FROM clases WHERE id = ?";
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setInt(1, idClase);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new Clase(
-                    rs.getInt("id"),
-                    rs.getString("tipoClase"),
+    public List<Clases> verClasesPorTipo(TipoClase tipoClase) {
+        String sql = "{CALL ver_clase_por_tipo(?)}"; 
+        List<Clases> lista = new ArrayList<>();
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setString(1, tipoClase.getNombreBD());  
+            ResultSet rs = cs.executeQuery();
+            while (rs.next()) {
+                lista.add(new Clases(
+                    rs.getInt("idClase"),
+                    tipoClase,
                     rs.getString("descripcion"),
                     rs.getDouble("precio"),
                     rs.getString("ubicacion"),
                     rs.getTimestamp("horario").toLocalDateTime(),
-                    rs.getInt("capacidad"),
-                    rs.getInt("IdEntrenador")
-                );
+                    rs.getInt("capacidadMax"),
+                    rs.getInt("personasInscritas"),
+                    rs.getInt("idEntrenador")
+                ));
             }
         } catch (SQLException e) {
-            System.err.println("Error buscando clase: " + e.getMessage());
+            System.err.println("Error obteniendo clases por tipo: " + e.getMessage());
         }
-        return null;
+        return lista;
     }
+
 
     public List<Clases> listarTodos() {
         List<Clases> lista = new ArrayList<>();
-        String sql = "SELECT * FROM clases ORDER BY horario DESC";
-        try (Statement st = conexion.createStatement(); 
-             ResultSet rs = st.executeQuery(sql)) {
+        String sql = "{CALL ver_clases()}"; 
+        try (CallableStatement cs = conexion.prepareCall(sql); 
+             ResultSet rs = cs.executeQuery()) {
             while (rs.next()) {
-                lista.add(new Clase(
+                TipoClase tipoClase = TipoClase.fromString(rs.getString("tipoClase"));
+                lista.add(new Clases(
                     rs.getInt("idClase"),
-                    rs.getString("tipoClase"),
+                    tipoClase,
                     rs.getString("descripcion"),
                     rs.getDouble("precio"),
                     rs.getString("ubicacion"),
                     rs.getTimestamp("horario").toLocalDateTime(),
-                    rs.getInt("capacidadMax")
+                    rs.getInt("capacidadMax"),
+                    rs.getInt("personasInscritas"),
+                    rs.getInt("idEntrenador")
                 ));
             }
         } catch (SQLException e) {
@@ -84,19 +93,19 @@ public class ClasesDAO {
     }
 
     public boolean actualizarClase(Clases clase) {
-        String sql = "UPDATE clases SET tipoClase = ?, descripcion = ?, precio = ?, ubicacion = ?, horario = ?, capacidad = ?, idEntrenador = ?  WHERE id = ?";
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setString(1, clase.getTipoClase());
-            ps.setString(2, clase.getDescripcion());
-            ps.setDouble(3, clase.getPrecio());
-            ps.setString(4, clase.getUbicacion());
-            ps.setTimestamp(5, Timestamp.valueOf(clase.getHorario())); // Convertir a Timestamp
-            ps.setInt(6, clase.getCapacidadMax());
-            ps.setInt(7, clase.getIdEntrenador());
-            ps.setInt(8, clase.getIdClase());
-            
+        String sql = "{CALL actualizar_clase(?, ?, ?, ?, ?, ?, ?, ?, ?)}"; // Confirmado por la base de datos
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setInt(1, clase.getIdClase());
+            cs.setString(2, clase.getTipoClase().getNombreBD());
+            cs.setString(3, clase.getDescripcion());
+            cs.setDouble(4, clase.getPrecio());
+            cs.setString(5, clase.getUbicacion());
+            cs.setTimestamp(6, Timestamp.valueOf(clase.getHorario())); // Convertir a Timestamp
+            cs.setInt(7, clase.getCapacidadMax());
+            cs.setInt(8, clase.getPersonasInscritas());
+            cs.setInt(9, clase.getIdEntrenador());
 
-            int filas = ps.executeUpdate();
+            int filas = cs.executeUpdate();
             return filas > 0;
         } catch (SQLException e) {
             System.err.println("Error actualizando clase: " + e.getMessage());
@@ -105,10 +114,10 @@ public class ClasesDAO {
     }
 
     public boolean eliminarClase(int idClase) {
-        String sql = "DELETE FROM clases WHERE id = ?";
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setInt(1, idClase);
-            int filas = ps.executeUpdate();
+        String sql = "{CALL eliminar_clase(?)}"; // Confirmado por la base de datos
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setInt(1, idClase);
+            int filas = cs.executeUpdate();
             return filas > 0;
         } catch (SQLException e) {
             System.err.println("Error eliminando clase: " + e.getMessage());
@@ -116,4 +125,3 @@ public class ClasesDAO {
         return false;
     }
 }
-
