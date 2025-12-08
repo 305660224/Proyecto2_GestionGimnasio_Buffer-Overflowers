@@ -10,17 +10,18 @@ package DTOs;
  */
 
 public class ClasesDTO {
-    private final String idClase;
-    private final String tipoClase;
-    private final String descripcion;
-    private final String precio;
-    private final String ubicacion;
-    private final String horario;
-    private final String idEntrenador;
-    private final int capacidadMax;
+    private int idClase;
+    private String tipoClase;
+    private String descripcion;
+    private double precio;
+    private String ubicacion;
+    private String horario;
+    private int idEntrenador;
+    private int personasInscritas;
+    private int capacidadMax;
     
 //CONSTRUCTOR
-    public ClasesDTO(String idClase, String tipoClase, String descripcion, String precio, String ubicacion, String horario, String idEntrenador, int capacidadMax) {
+    public ClasesDTO(int idClase, String tipoClase, String descripcion, double precio, String ubicacion, String horario, int idEntrenador,int personasInscritas,  int capacidadMax) {
         this.idClase = idClase;
         this.tipoClase = tipoClase;
         this.descripcion = descripcion;
@@ -29,15 +30,17 @@ public class ClasesDTO {
         this.horario = horario;
         this.idEntrenador = idEntrenador;
         this.capacidadMax = capacidadMax;
+        this.personasInscritas = personasInscritas;
     }
 
     //METODOS
-    public String getIdClase() { return idClase; }
+    public int getIdClase() { return idClase; }
     public String getTipoClase() { return tipoClase; }
     public String getDescripcion() { return descripcion; }
-    public String getPrecio() { return precio; }
+    public double getPrecio() { return precio; }
     public String getUbicacion() { return ubicacion; }
     public String getHorario() { return horario; }
-    public String getIdEntrenador() { return idEntrenador; }
+    public int getIdEntrenador() { return idEntrenador; }
     public int getCapacidadMax() { return capacidadMax; }
+    public int getPersonasInscritas() { return personasInscritas; }
 }
