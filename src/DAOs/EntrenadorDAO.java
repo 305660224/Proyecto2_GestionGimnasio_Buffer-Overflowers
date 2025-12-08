@@ -24,7 +24,7 @@ public class EntrenadorDAO {
     }
 
     public boolean registrarEntrenador(Entrenador entrenador) {
-        String sql = "{CALL agregar_entrenador(?, ?, ?, ?, ?)}"; // Procedimiento almacenado para registrar
+        String sql = "{CALL agregar_entrenador(?, ?, ?, ?, ?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setString(1, entrenador.getNombre());
             cs.setString(2, entrenador.getPrimerApellido());
@@ -41,7 +41,7 @@ public class EntrenadorDAO {
     }
 
     public Entrenador buscarPorId(int idEntrenador) {
-        String sql = "{CALL ver_entrenador(?)}"; // Procedimiento almacenado para buscar por ID
+        String sql = "{CALL ver_entrenador(?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setInt(1, idEntrenador);
             ResultSet rs = cs.executeQuery();
@@ -64,7 +64,7 @@ public class EntrenadorDAO {
 
     public List<Entrenador> listarTodos() {
         List<Entrenador> lista = new ArrayList<>();
-        String sql = "{CALL ver_entrenadores()}"; // Procedimiento almacenado para listar entrenadores
+        String sql = "{CALL ver_entrenadores()}"; 
         try (CallableStatement cs = conexion.prepareCall(sql); 
              ResultSet rs = cs.executeQuery()) {
             while (rs.next()) {
@@ -85,7 +85,7 @@ public class EntrenadorDAO {
     }
 
     public boolean actualizarEntrenador(Entrenador entrenador) {
-        String sql = "{CALL actualizar_entrenador(?, ?, ?, ?, ?, ?)}"; // Procedimiento almacenado para actualizar
+        String sql = "{CALL actualizar_entrenador(?, ?, ?, ?, ?, ?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setInt(1, entrenador.getIdEntrenador());
             cs.setString(2, entrenador.getNombre());
@@ -103,7 +103,7 @@ public class EntrenadorDAO {
     }
 
     public boolean eliminarEntrenador(int idEntrenador) {
-        String sql = "{CALL eliminar_entrenador(?)}"; // Procedimiento almacenado para eliminar entrenador
+        String sql = "{CALL eliminar_entrenador(?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setInt(1, idEntrenador);
             int filas = cs.executeUpdate();

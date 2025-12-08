@@ -40,6 +40,31 @@ public class ClasesDAO {
         }
         return false;
     }
+    
+     public Clases buscarPorId(int idClase) {
+        String sql = "{CALL buscar_clase(?)}";
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setInt(1, idClase);
+            ResultSet rs = cs.executeQuery();
+            if (rs.next()) {
+                TipoClase tipoClase = TipoClase.fromString(rs.getString("tipoClase"));
+                return new Clases(
+                    rs.getInt("idClase"),
+                    tipoClase,
+                    rs.getString("descripcion"),
+                    rs.getDouble("precio"),
+                    rs.getString("ubicacion"),
+                    rs.getTimestamp("horario").toLocalDateTime(),
+                    rs.getInt("capacidadMax"),
+                    rs.getInt("personasInscritas"),
+                    rs.getInt("idEntrenador")
+                );
+            }
+        } catch (SQLException e) {
+            System.err.println("Error buscando clase por id: " + e.getMessage());
+        }
+        return null;
+    }
 
     public List<Clases> verClasesPorTipo(TipoClase tipoClase) {
         String sql = "{CALL ver_clase_por_tipo(?)}"; 
@@ -93,7 +118,7 @@ public class ClasesDAO {
     }
 
     public boolean actualizarClase(Clases clase) {
-        String sql = "{CALL actualizar_clase(?, ?, ?, ?, ?, ?, ?, ?, ?)}"; // Confirmado por la base de datos
+        String sql = "{CALL actualizar_clase(?, ?, ?, ?, ?, ?, ?, ?, ?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
             cs.setInt(1, clase.getIdClase());
             cs.setString(2, clase.getTipoClase().getNombreBD());
