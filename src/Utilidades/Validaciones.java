@@ -4,6 +4,7 @@
  */
 package Utilidades;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
@@ -47,6 +48,17 @@ public class Validaciones {
         try {
             DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return LocalDate.parse(fechaTexto, formato);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+      public static LocalDateTime parsearFechaHora(String fechaHoraTexto) {
+        if (fechaHoraTexto == null || fechaHoraTexto.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            return LocalDateTime.parse(fechaHoraTexto, formato);
         } catch (DateTimeParseException e) {
             return null;
         }
