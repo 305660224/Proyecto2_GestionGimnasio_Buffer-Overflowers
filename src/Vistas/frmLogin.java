@@ -104,7 +104,6 @@ public class frmLogin extends javax.swing.JFrame {
 
         txtContraseña.setBackground(new java.awt.Color(0, 0, 0));
         txtContraseña.setForeground(new java.awt.Color(255, 255, 255));
-        txtContraseña.setText("jPasswordField1");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);

@@ -37,7 +37,7 @@ public class GeneradorXML {
             // Formatear fecha
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             
-            // Agregar elementos
+            // Agrega info
             agregarElemento(doc, facturaElement, "IdPago", String.valueOf(idPago));
             agregarElemento(doc, facturaElement, "Cliente", cliente);
             agregarElemento(doc, facturaElement, "Fecha", sdf.format(fecha));
@@ -48,7 +48,7 @@ public class GeneradorXML {
             agregarElemento(doc, facturaElement, "Emisor", "Gimnasio UTN");
             agregarElemento(doc, facturaElement, "TipoDocumento", "FacturaElectronica");
             
-            // Guardar archivo
+            // Guarda el archivo
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
@@ -58,9 +58,7 @@ public class GeneradorXML {
             StreamResult result = new StreamResult(new File(ruta));
             
             transformer.transform(source, result);
-            
-            System.out.println("Factura XML generada: " + ruta);
-            
+                       
         } catch (Exception e) {
             System.err.println("Error generando XML: " + e.getMessage());
             e.printStackTrace();

@@ -16,37 +16,49 @@ import javax.swing.table.DefaultTableModel;
  */
 public class pnUsuarios extends javax.swing.JPanel {
  private ControladorUsuario controladorUsuario;
+private DefaultTableModel modelo;
     /**
      * Creates new form pnUsuarios
      */
     public pnUsuarios() {
         initComponents();
-         controladorUsuario = new ControladorUsuario();
-        cargarTablaUsuarios();  
+        inicializarComponentes();
+        controladorUsuario = new ControladorUsuario();
+        cargarTablaUsuarios(); 
     }
   
-    private void cargarTablaUsuarios() {
-        List<Usuario> usuarios = controladorUsuario.obtenerTodosLosUsuarios();
-        DefaultTableModel modelo = (DefaultTableModel) tblUsuarios.getModel();
-        modelo.setRowCount(0); 
+   private void inicializarComponentes() {
+        // Configurar modelo de tabla
+        modelo = new DefaultTableModel(
+            new Object[][]{},
+            new String[]{"ID", "Usuario", "Rol"}
+        );
+        tblUsuarios.setModel(modelo);
+    }
+   
+   private void cargarTablaUsuarios() {
+        try {
+            List<Usuario> usuarios = controladorUsuario.obtenerTodosLosUsuarios();
+            modelo.setRowCount(0); 
 
-        
-        for (Usuario usuario : usuarios) {
-            modelo.addRow(new Object[] {
-                usuario.getIdusuario(),
-                usuario.getUsuario(),
-                usuario.getIdRol().name() 
-            });
+            for (Usuario usuario : usuarios) {
+                modelo.addRow(new Object[] {
+                    usuario.getIdusuario(),
+                    usuario.getUsuario(),
+                    usuario.getIdRol() != null ? usuario.getIdRol().name() : "Sin rol"
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar usuarios: " + e.getMessage());
         }
     }
     
-    
-     // Limpiar el formulario
     private void limpiarFormulario() {
         txtUsuario.setText("");
         txtContrasena.setText("");
         cbRol.setSelectedIndex(0);
     }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -220,64 +232,101 @@ public class pnUsuarios extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        // TODO add your handling code here:
+         // Recargar la tabla desde la base de datos
+        cargarTablaUsuarios();
+        JOptionPane.showMessageDialog(this, "Tabla actualizada");
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-         String nombreUsuario = txtUsuario.getText().trim();
-        String passwordPlana = new String(txtContrasena.getPassword());
-        int idRol = cbRol.getSelectedIndex(); 
+         try {
+            String nombreUsuario = txtUsuario.getText().trim();
+            String passwordPlana = new String(txtContrasena.getPassword());
+            
+            // Obtener el rol seleccionado (0: Entrenador, 1: Administrador)
+            String rolSeleccionado = (String) cbRol.getSelectedItem();
+            int idRol = rolSeleccionado.equals("Administrador") ? 1 : 0;
 
-        if (nombreUsuario.isEmpty() || passwordPlana.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, ingrese todos los datos");
-            return;
-        }
+            if (nombreUsuario.isEmpty() || passwordPlana.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, ingrese todos los datos");
+                return;
+            }
 
-        boolean exito = controladorUsuario.agregarUsuario(nombreUsuario, passwordPlana, idRol);
+            boolean exito = controladorUsuario.agregarUsuario(nombreUsuario, passwordPlana, idRol);
 
-        if (exito) {
-            JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
-            cargarTablaUsuarios(); 
-            limpiarFormulario();
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al registrar el usuario");
+            if (exito) {
+                JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
+                cargarTablaUsuarios(); 
+                limpiarFormulario();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al registrar el usuario");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-         int filaSeleccionada = tblUsuarios.getSelectedRow();
+ int filaSeleccionada = tblUsuarios.getSelectedRow();
 
         if (filaSeleccionada == -1) {
             JOptionPane.showMessageDialog(this, "Seleccione un usuario para eliminar");
             return;
         }
 
-        int idUsuario = (int) tblUsuarios.getValueAt(filaSeleccionada, 0); 
+        try {
+            int idUsuario = (int) modelo.getValueAt(filaSeleccionada, 0);
+            String nombreUsuario = (String) modelo.getValueAt(filaSeleccionada, 1);
+            
+            int confirmacion = JOptionPane.showConfirmDialog(
+                this, 
+                "¿Está seguro de eliminar al usuario: " + nombreUsuario + "?", 
+                "Confirmar eliminación", 
+                JOptionPane.YES_NO_OPTION
+            );
 
-        boolean exito = controladorUsuario.eliminarUsuario(idUsuario);
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                boolean exito = controladorUsuario.eliminarUsuario(idUsuario);
 
-        if (exito) {
-            JOptionPane.showMessageDialog(this, "Usuario eliminado correctamente");
-            cargarTablaUsuarios();  
-        } else {
-            JOptionPane.showMessageDialog(this, "No se puede eliminar al usuario seleccionado.");
+                if (exito) {
+                    JOptionPane.showMessageDialog(this, "Usuario eliminado correctamente");
+                    cargarTablaUsuarios();  
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se puede eliminar al usuario seleccionado.");
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al eliminar usuario: " + e.getMessage());
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-            String criterioBusqueda = txtUsuario.getText().trim();
+String criterioBusqueda = txtUsuario.getText().trim();
 
-        // Filtrar la tabla con el criterio de búsqueda
-        //Aqui va el metodo para buscar 
-        DefaultTableModel modelo = (DefaultTableModel) tblUsuarios.getModel();
-        modelo.setRowCount(0); // Limpiar la tabla
+        if (criterioBusqueda.isEmpty()) {
+            cargarTablaUsuarios(); // Mostrar todos si no hay criterio
+            return;
+        }
 
-        for (Usuario usuario : usuariosFiltrados) {
-            modelo.addRow(new Object[] {
-                usuario.getIdusuario(),
-                usuario.getUsuario(),
-                usuario.getIdRol().name()
-            });
+        try {
+            // Obtener todos los usuarios y filtrar localmente
+            List<Usuario> todosUsuarios = controladorUsuario.obtenerTodosLosUsuarios();
+            modelo.setRowCount(0); // Limpiar la tabla
+
+            for (Usuario usuario : todosUsuarios) {
+                if (usuario.getUsuario().toLowerCase().contains(criterioBusqueda.toLowerCase())) {
+                    modelo.addRow(new Object[] {
+                        usuario.getIdusuario(),
+                        usuario.getUsuario(),
+                        usuario.getIdRol() != null ? usuario.getIdRol().name() : "Sin rol"
+                    });
+                }
+            }
+            
+            if (modelo.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "No se encontraron usuarios con ese nombre");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al buscar usuarios: " + e.getMessage());
         }
     }//GEN-LAST:event_btnBuscarActionPerformed
 

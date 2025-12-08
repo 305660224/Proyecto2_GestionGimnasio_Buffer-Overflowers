@@ -26,19 +26,23 @@ public class ControladorPagos {
         this.pagoDAO = new PagoDAO();
     }
 
-    /**
-     * Registra un pago (solo cedulaCliente y fecha en BD)
-     * y genera facturas con cálculos
-     */
-      public boolean registrarPago(String cedulaCliente, Date fecha, 
-                               double totalAPagar, boolean generarPDF, boolean generarXML) {
+/**
+ * Registra el pago de un cliente YA EXISTENTE en la DB, 
+ * @param cedulaCliente
+ * @param fecha
+ * @param totalAPagar
+ * @param generarPDF
+ * @param generarXML
+ * @return booleano Si el pago fue registrado o no
+ */
+      public boolean registrarPago(String cedulaCliente, Date fecha, double subtotal, double impuesto, boolean generarPDF, boolean generarXML) {
         
-        // Calcular subtotal e impuesto (13%)
-        double subtotal = totalAPagar / 1.13;
-        double impuesto = totalAPagar - subtotal;
-        
+        // Calcular subtotal e impuesto
+            double imp = impuesto/100;
+            double total = subtotal+(subtotal*imp);
+            
         // Crear objeto Pago completo
-        Pago pago = new Pago(0, cedulaCliente, fecha, subtotal, impuesto, totalAPagar);
+        Pago pago = new Pago(0, cedulaCliente, fecha, subtotal, impuesto, total);
         
         // Registrar en BD
         boolean registrado = pagoDAO.registrarPago(pago);
@@ -89,48 +93,34 @@ public class ControladorPagos {
         return dto;
     }
 
-    /**
-     * Genera comprobantes para un pago existente
-     */
-    public void generarComprobantesExistente(int idPago, boolean generarPDF, boolean generarXML) {
-        Pago pago = pagoDAO.buscarPorId(idPago);
-        
-        if (pago == null) {
-            System.err.println("Pago no encontrado con ID: " + idPago);
-            return;
-        }
-        
-        String nombreCliente = obtenerNombreCliente(pago.getCedulaCliente());
-        generarComprobantes(pago, nombreCliente, generarPDF, generarXML);
-    }
-
+/**
+ * Elimina un pago existente, el id es DEL PAGO no del cliente
+ * @param idPago
+ * @return 
+ */
 public boolean eliminarPago(int idPago) {
     try {
-        // Primero, verifica si el pago existe
+        //pago existe
         Pago pago = pagoDAO.buscarPorId(idPago);
         if (pago == null) {
-            System.err.println("Pago con ID " + idPago + " no encontrado");
             return false;
         }
         
-        // Llama al método eliminar del DAO
+        //eliminarDAO
         boolean eliminado = pagoDAO.eliminarPago(idPago);
         
         if (!eliminado) {
-            System.err.println("Error eliminando" + idPago);
         }
         
         return eliminado;
         
     } catch (Exception e) {
-        System.err.println("Error en eliminarPago: " + e.getMessage());
         return false;
     }
 }
     
-    /**
-     * Método privado para generar comprobantes
-     */
+//METODOS PRIVADOS --------------------------------------------------------------
+
     private void generarComprobantes(Pago pago, String nombreCliente, boolean generarPDF, boolean generarXML) {
         if (pago == null) return;
         
@@ -148,7 +138,6 @@ public boolean eliminarPago(int idPago) {
             pago.getTotal()
         );
             
-            // Abrir automáticamente si hay archivo HTML
             abrirComprobanteEnNavegador(rutaPDF.replace(".pdf", ".html"));
         }
         
@@ -171,10 +160,9 @@ public boolean eliminarPago(int idPago) {
             
             if (Desktop.isDesktopSupported() && archivo.exists()) {
                 Desktop.getDesktop().open(archivo);
-                System.out.println("Comprobante abierto en navegador");
             }
         } catch (Exception e) {
-            System.err.println("No se pudo abrir :( : " + e.getMessage());
+            System.err.println("No funko el html :( : " + e.getMessage());
         }
     }
 
@@ -182,8 +170,7 @@ public boolean eliminarPago(int idPago) {
      * ELIMINAR XXXXXXXXXXXXXXXX
      */
     private String obtenerNombreCliente(String cedulaCliente) {
-        // TODO: Implementar conexión a tabla clientes
-        if ("102345678".equals(cedulaCliente)) return "Laura Soto Ramirez";
+       if ("102345678".equals(cedulaCliente)) return "Laura Soto Ramirez";
         if ("71234567890".equals(cedulaCliente)) return "Pedro Lopez Mora";
         return "Cliente con cédula: " + cedulaCliente;
     }
