@@ -15,7 +15,6 @@ import java.util.Date;
  */
 public class GeneradorPDF {
     public static void generarComprobantePago(String ruta, int idPago, String cliente, Date fecha, double subtotal, double impuesto, double total) {
-        
         try {
             String rutaHTML = ruta.replace(".pdf", ".html");
             
@@ -56,15 +55,15 @@ public class GeneradorPDF {
                             </tr>
                             <tr>
                                 <td>Subtotal</td>
-                                <td>%,.2f₡</td>
+                                <td>%,.2f(₡)</td>
                             </tr>
                             <tr>
-                                <td>Impuesto (%)</td>
-                                <td>%,.2f₡</td>
+                                <td>Impuesto</td>
+                                <td>%,.2f(₡)</td>
                             </tr>
                             <tr class="total-row">
                                 <td>TOTAL</td>
-                                <td>%,.2f₡</td>
+                                <td>%,.2f(₡)</td>
                             </tr>
                         </table>
                         

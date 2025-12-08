@@ -78,8 +78,6 @@ double total;
     }
     
     private void cargarTotal() {
-            String cedulaCliente = txtCedulaCliente.getText().trim();
-            String fechaTexto = txtFechaPago.getText().trim();
             String impuesto = txtImpuesto.getText().trim();
             String subtotal = txtSubtotal.getText().trim();
             
@@ -351,8 +349,9 @@ double total;
                 try {
             String cedulaCliente = txtCedulaCliente.getText().trim();
             String fechaTexto = txtFechaPago.getText().trim();
-            double impuesto = Double.parseDouble(txtImpuesto.getText().trim());
-            double subtotal = Double.parseDouble(txtSubtotal.getText().trim());
+            
+            String txtimpuesto = txtImpuesto.getText().trim();
+            String txtsubtotal = txtSubtotal.getText().trim();
             
             // Validaciones básicas
             if (cedulaCliente.isEmpty()) {
@@ -366,12 +365,12 @@ double total;
             }
             
             
-            if (impuesto == 0) {
+            if (txtimpuesto.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Ingrese el impuesto");
                 return;
             }
             
-            if (subtotal == 0) {
+            if (txtsubtotal.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Ingrese el subtotal");
                 return;
             }
@@ -379,6 +378,9 @@ double total;
             // Convertir datos
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date fechaPago = sdf.parse(fechaTexto);
+            
+            double impuesto  = Double.parseDouble(txtimpuesto);
+            double subtotal  = Double.parseDouble(txtsubtotal);
             cargarTotal();
             
             boolean ImprimirFactura = btnGenerarFactura.isSelected();
