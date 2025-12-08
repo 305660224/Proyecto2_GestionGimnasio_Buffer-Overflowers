@@ -44,7 +44,7 @@ public class ClienteDAO {
     public Cliente buscarPorId(String cedula) {
         String sql = "{CALL ver_cliente(?)}"; 
         try (CallableStatement cs = conexion.prepareCall(sql)) {
-            cs.setString(1, cedula);
+            cs.setString(1, cedula.trim());
             ResultSet rs = cs.executeQuery();
             if (rs.next()) {
                 return new Cliente(
@@ -108,14 +108,15 @@ public class ClienteDAO {
     }
 
     public boolean eliminarCliente(String cedula) {
-        String sql = "{CALL eliminar_cliente(?)}"; 
-        try (CallableStatement cs = conexion.prepareCall(sql)) {
-            cs.setString(1, cedula);
-            int filas = cs.executeUpdate();
-            return filas > 0;
-        } catch (SQLException e) {
-            System.err.println("Error eliminando cliente: " + e.getMessage());
-        }
+    String sql = "{CALL eliminar_cliente(?)}";
+    try (CallableStatement cs = conexion.prepareCall(sql)) {
+        cs.setString(1, cedula.trim());
+
+        cs.execute();
+        return true; 
+        
+    } catch (SQLException e) {
         return false;
     }
+}
 }
