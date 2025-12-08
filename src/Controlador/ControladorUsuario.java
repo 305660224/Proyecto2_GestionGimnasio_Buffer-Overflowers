@@ -19,7 +19,7 @@ public class ControladorUsuario {
     public ControladorUsuario(){
        this.usuarioDAO = usuarioDAO;
     }
-    
+     
     /**
      * Método para registrar un nuevo empleado en el sistema.
      * Este método lo usará la ventana de "Administración de Usuarios".
@@ -58,4 +58,24 @@ public class ControladorUsuario {
     public List<Usuario> obtenerTodosLosUsuarios() {
         return usuarioDAO.listarTodos(); 
     }
+    public Usuario buscarPorUsername(String username) {
+        return usuarioDAO.buscarPorUsername(username);
+    }
+
+    public boolean actualizarUsuario(int id, String usuario, String passwordPlana, int idRol) {
+        Usuario u = new Usuario();
+        u.setIdusuario(id);
+        u.setUsuario(usuario);
+
+        if (passwordPlana != null && !passwordPlana.isEmpty()) {
+            u.setContrasena(Seguridad.encriptar(passwordPlana));
+        } else {
+             u.setContrasena(Seguridad.encriptar(passwordPlana));
+        }
+        
+        u.setIdRol(EnumRol.porId(idRol));
+        
+        return usuarioDAO.actualizar(u);
+    }
+  
 }
