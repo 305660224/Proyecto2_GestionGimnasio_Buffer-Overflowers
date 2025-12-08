@@ -1,0 +1,31 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql_gimnasio
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: gimnasio
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./gimnacioFit.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    command: 
+      - --bind-address=0.0.0.0
+      - --skip-name-resolve
+      # ← ELIMINA esta línea
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_gimnasio
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    ports:
+      - "8081:80"
+
+volumes:
+  mysql_data:
