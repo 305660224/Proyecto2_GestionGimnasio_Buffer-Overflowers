@@ -14,51 +14,46 @@ import java.util.List;
  *
  * @author ASUS
  */
+
 public class PagoDAO {
     private final Connection conexion;
 
     public PagoDAO() {
         this.conexion = ConexionBD.getInstancia().getConexion();
     }
-    
-    // Registra solo cedulaCliente y fecha en BD
+
     public boolean registrarPago(Pago pago) {
-        String sql = "INSERT INTO historialpagos (cedulaCliente, fechaPago) VALUES (?, ?)";
-        try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, pago.getCedulaCliente());
-            ps.setTimestamp(2, new java.sql.Timestamp(pago.getFechaPago().getTime()));
-            
-            int filas = ps.executeUpdate();
+        String sql = "{CALL agregar_pago(?, ?)}"; 
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setString(1, pago.getCedulaCliente());
+            cs.setTimestamp(2, new java.sql.Timestamp(pago.getFechaPago().getTime())); 
+
+            int filas = cs.executeUpdate();
             return filas > 0;
         } catch (SQLException e) {
             System.err.println("Error registrando pago: " + e.getMessage());
         }
         return false;
     }
-    
-     public boolean eliminarPago(int idPago) {
-        String sql = "DELETE FROM historial_pagos WHERE id_pago = ?";
-        
-        try (Connection conn = ConexionBD.getInstancia().getConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, idPago);
-            int filasAfectadas = pstmt.executeUpdate();
-            
-            return filasAfectadas > 0; // Retorna true si se eliminó al menos una fila
-            
+
+    public boolean eliminarPago(int idPago) {
+        String sql = "{CALL eliminar_pago(?)}"; 
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setInt(1, idPago);
+            int filas = cs.executeUpdate();
+            return filas > 0;
         } catch (SQLException e) {
-            System.err.println("Error eliminando" + idPago + ": " + e.getMessage());
-            return false;
+            System.err.println("Error eliminando pago: " + e.getMessage());
         }
+        return false;
     }
-    
-    // Busca por ID (solo devuelve los 3 campos de BD)
+
+    //buscar pago por idPago
     public Pago buscarPorId(int idPago) {
         String sql = "SELECT idPago, cedulaCliente, fechaPago FROM historialpagos WHERE idPago = ?";
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setInt(1, idPago);
-            ResultSet rs = ps.executeQuery();
+        try (CallableStatement cs = conexion.prepareCall(sql)) {
+            cs.setInt(1, idPago);
+            ResultSet rs = cs.executeQuery();
             if (rs.next()) {
                 return new Pago(
                     rs.getInt("idPago"),
@@ -71,13 +66,12 @@ public class PagoDAO {
         }
         return null;
     }
-    
-    // Lista todos (solo los 3 campos de BD)
+
     public List<Pago> listarTodos() {
         List<Pago> lista = new ArrayList<>();
-        String sql = "SELECT * FROM historialpagos ORDER BY fechaPago DESC";
-        try (Statement st = conexion.createStatement(); 
-             ResultSet rs = st.executeQuery(sql)) {
+        String sql = "{CALL ver_historial_pagos()}"; 
+        try (CallableStatement cs = conexion.prepareCall(sql); 
+             ResultSet rs = cs.executeQuery()) {
             while (rs.next()) {
                 lista.add(new Pago(
                     rs.getInt("idPago"),
@@ -89,19 +83,5 @@ public class PagoDAO {
             System.err.println("Error listando pagos: " + e.getMessage());
         }
         return lista;
-    }
-    
-    // Obtiene último ID insertado
-    public int obtenerUltimoIdInsertado() {
-        String sql = "SELECT LAST_INSERT_ID() as last_id";
-        try (Statement st = conexion.createStatement(); 
-             ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) {
-                return rs.getInt("last_id");
-            }
-        } catch (SQLException e) {
-            System.err.println("Error obteniendo último ID: " + e.getMessage());
-        }
-        return -1;
     }
 }
